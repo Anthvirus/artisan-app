@@ -1,8 +1,8 @@
 import { Disclosure, DisclosureButton, DisclosurePanel, MenuItem, MenuItems, MenuButton, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
-import { signOut } from 'firebase/auth';
-import { auth } from '../firebaseConfig';
+// import { signOut } from 'firebase/auth';
+// import { auth } from '../firebaseConfig';
 import { useNavigate } from 'react-router-dom';
 import { Fragment, useState } from 'react';
 import Popup from './popup';
@@ -158,7 +158,7 @@ export default function ClientNavBar({userData, toggleHome, toggleConnections}) 
                   <img className="w-10 h-10 rounded-full" src={userData?.profilePicture} alt="" />
                 </div>
                 <div className="ml-3">
-                  <div className="text-base font-medium text-gray-900">{`${userData?.firstname} ${userData?.lastname}`}</div>
+                  <div className="text-base font-medium text-gray-900">{`${userData?.fname} ${userData?.lname}`}</div>
                   <div className="text-sm font-medium text-gray-500">{userData?.email}</div>
                 </div>
                 <button

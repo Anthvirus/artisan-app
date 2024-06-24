@@ -1,29 +1,35 @@
 import { useEffect, useState } from 'react';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { auth, db } from '../firebaseConfig';
+// import { collection, query, where, getDocs } from 'firebase/firestore';
+// import { auth, db } from '../firebaseConfig';
 import ArtisanTaskCard from './artisan-task';
+import axios from 'axios';
+import { baseUrl } from '../../constants/server';
 
 export default function TasksList() {
-  const { currentUser } = auth;
+  
   const [tasks, setTasks] = useState([]);
+  const userId = localStorage.getItem('userId') // Get the userId from the Redux state
+  console.log('User',userId)
+
 
   useEffect(() => {
-    const fetchTasksData = async () => {
-      if (currentUser) {
-        const tasksRef = collection(db, 'tasks');
-        const q = query(tasksRef, where('artisanId', '==', currentUser.uid));
-        try {
-          const querySnapshot = await getDocs(q);
-          const tasksData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          setTasks(tasksData);
-        } catch (error) {
-          console.error('Error fetching tasks data:', error);
+    const fetchAppointments = async () => {
+      try {
+        const response = await axios.get(`${baseUrl}/appointments/artisan/${userId}`);
+        if (response.status === 200) {
+          setTasks(response.data);
+          console.log('Appointments fetched:', response.data);
+        } else {
+          console.error('Error fetching appointments:', response.data.message);
         }
+      } catch (error) {
+        console.error('Error fetching appointments:', error);
       }
     };
 
-    fetchTasksData();
-  }, [currentUser]);
+
+    fetchAppointments();
+  }, [userId]);
 
   return (
           <div className='w-full mx-2 p-4 md:mx-auto mt-2 bg-gray-100 lg:w-1/2 rounded-xl max-h-[30rem] overflow-y-auto'>
@@ -34,11 +40,11 @@ export default function TasksList() {
               tasks.map((task, id) => (
                 <ArtisanTaskCard
                   key={id}
-                  clientName={task.clientName}
-                  amountAgreed={task.amountAgreed}
-                  startDate={task.startDate}
-                  endDate={task.endDate}
-                  taskDescription={task.taskDescription}
+                  clientName={task.client_name}
+                  amountAgreed={task.amount}
+                  startDate={task.start_date}
+                  endDate={task.end_date}
+                  taskDescription={task.description}
                   // delete={deleteAppointment}
                 />
               ))

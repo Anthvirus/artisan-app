@@ -1,20 +1,27 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Button from "./Button";
+import { loginUser } from '../redux/slices/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
 import InputBox from "./Input";
 
 function UserSignInForm(){
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState({ email: '', password: '' })
+  const [errors, setErrors] = useState({ email: '', password: '' });
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-    function validate (){
+  const { status, error, user } = useSelector((state) => state.user);
+
+  function validate() {
     let valid = true;
     let errors = { email: '', password: '' };
-    var regxEmail = /^([a-zA-Z0-9._]+)@([a-zA-Z0-9]+)([.])([a-z]+)(.[a-z]+)?$/;
+    const emailRegex = /^([a-zA-Z0-9._]+)@([a-zA-Z0-9]+)([.])([a-z]+)(.[a-z]+)?$/;
 
-    if ((!regxEmail.test(email))) {
-      errors.email = 'Wrong Email Format';
+    if (!emailRegex.test(email)) {
+      errors.email = 'Please enter a valid email address';
       valid = false;
     }
 
@@ -26,11 +33,27 @@ function UserSignInForm(){
     setErrors(errors);
     return valid;
   }
-
-  function handleSubmit(event){
+  async function handleSubmit(event) {
     event.preventDefault();
     if (validate()) {
-      console.log('Form submitted:',  {email, password} );
+      setIsLoading(true);
+      try {
+        await dispatch(loginUser({ email, password })).unwrap();
+        navigate('/clienthome');
+      } catch (error) {
+        console.error('Error signing in:', error);
+        toast.error(`Error signing in: ${error.message || 'Login Failed'}`, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      } finally {
+        setIsLoading(false);
+      }
     }
   }
 

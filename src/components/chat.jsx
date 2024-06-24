@@ -4,10 +4,8 @@ import axios from "axios";
 import io from "socket.io-client";
 import { baseUrl } from "../../constants/server";
 
-export default function Chat() {
-  const { state } = useLocation();
-  const connection_id = state?.connection_id;
-  const receiver_id = state?.receiver_id;
+export default function Chat({connection_id, receiver_id}) {
+
   const userId = localStorage.getItem("userId");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
@@ -16,7 +14,7 @@ export default function Chat() {
     fname: "",
     lname: "",
   });
-  const messagesEndRef = useRef(null);
+  
 
   useEffect(() => {
     if (!connection_id) {
@@ -133,20 +131,28 @@ export default function Chat() {
       {/* Chat Messages */}
       <div className="flex-1 p-4 overflow-y-auto">
         <div className="space-y-4">
-          {/* Message from others */}
-          <div className="flex">
-            <div className="max-w-md px-4 py-3 text-xl font-bold text-green-900 bg-gray-300 shadow rounded-2xl">
-              Hello!
-            </div>
-          </div>
+          
 
           {/* Message from user */}
           {messages.map((msg, index)=>(
-            <div className="flex flex-col items-end" key={index}>
-            <div className="max-w-md px-4 py-3 text-xl font-bold text-white bg-green-800 shadow-md rounded-2xl min-h-10">
-              {msg.text}
+            <div
+            className={
+              msg.sender === userId
+                ? "flex flex-col items-end"
+                : "flex flex-col"
+            }
+            key={index}
+          >
+            <div
+              className={`max-w-md px-4 py-3 text-xl font-bold shadow rounded-2xl min-h-10 ${
+                msg.sender === userId
+                  ? "text-white bg-green-800"
+                  : "text-green-900 bg-gray-300"
+              }`}
+            >
+              {msg.content}
             </div>
-            <span className='mt-1 text-xs'>{msg.timestamp.toLocaleTimeString()}</span>
+            <span className='mt-1 text-xs'>{new Date(msg.timestamp).toLocaleTimeString()}</span>
           </div>
           ))}
         </div>

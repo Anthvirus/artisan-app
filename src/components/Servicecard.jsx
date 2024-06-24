@@ -1,15 +1,42 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Popup from "./popup";
 import SearchBar from "./searchcomponent";
 import Artisans from "./Artisans";
 import ArtisanComponent from "./artisansearch-component.jsx";
+import { baseUrl } from "../../constants/server.js";
 
 export default function ServiceCard(service){
     const [showFinder, setFinder] = useState(false);
+    const [query, setQuery] = useState('');
+    const [artisans, setArtisans] = useState([]);
 
   const toggleFinder = () => {
     setFinder(!showFinder);
   }
+  const fetchArtisans = async (searchQuery = '') => {
+    try {
+      const response = await fetch(
+        `${baseUrl}/users/search?service=${service.name}&user_type=artisan&query=${searchQuery}`
+      );
+      const data = await response.json();
+      if (response.ok) {
+        setArtisans(data);
+      } else {
+        console.error("Error fetching artisans:", data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching artisans:", error);
+    }
+  };
+  const handleSearch = (searchQuery) => {
+    setQuery(searchQuery);
+  };
+
+  useEffect(() => {
+    if (query || showFinder) {
+      fetchArtisans(query);
+    }
+  }, [query, showFinder]);
     return (
         <div>
               <div key={service.id} className="relative cursor-pointer group" onClick={toggleFinder}>
@@ -31,9 +58,16 @@ export default function ServiceCard(service){
                 <Popup show={showFinder} onClose={toggleFinder} HeaderText={service.HeaderText}>
                   <SearchBar/>
                   <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
-                    <ArtisanComponent name={Artisans.name} rating={Artisans.rating} availabilty={Artisans.availabilty} service={Artisans.service} image={Artisans.image}/>
-                    <ArtisanComponent name={Artisans.name} rating={Artisans.rating} availabilty={Artisans.availabilty} service={Artisans.service} image={Artisans.image}/>
-                    <ArtisanComponent name={Artisans.name} rating={Artisans.rating} availabilty={Artisans.availabilty} service={Artisans.service} image={Artisans.image}/>
+                  {artisans.map((artisan) => (
+              <ArtisanComponent
+                key={artisan._id}
+                artisanId={artisan._id}
+                name={artisan.fname + " " + artisan.lname}
+                service={artisan.user_type}
+                image={artisan.picture}
+              />
+            ))}
+
                   </div>
                   <div className='flex'>
                     <h2 className='mx-auto mt-10 text-xl'>Suggestions</h2>

@@ -11,6 +11,7 @@ import UserProfilePage from './pages/clients/userprofilepage';
 import ArtisanProfilePage from './pages/artisan/artisan-profilepage';
 import ChatPage from './pages/chatpage';
 import TransactionPage from './pages/transactionpage';
+import SectionPage from "./pages/sectionpage.jsx";
 import { Provider } from 'react-redux';
 import store from "./redux/store.jsx";
 
@@ -19,6 +20,7 @@ function App() {
     <Provider store={store}>
       <BrowserRouter>
       <Routes>
+      <Route path='/' element={<SectionPage />} />
         <Route path='/artisandashboard' element={<ArtisanHome />} />
         <Route path='/artisansignin' element={<ArtisanSignInPage />} />
         <Route path='/artisanprofile' element={<ArtisanProfilePage />} />
