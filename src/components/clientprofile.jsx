@@ -1,20 +1,31 @@
 import { useState } from "react";
 import Button from "./Button";
+import { editUser } from '../redux/slices/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from "react-router-dom";
+export default function ClientProfile({user}){
+ 
 
-export default function ClientProfile(){
-    const [user, setUser] = useState({
-    name: 'John Doe',
-    location: 'New York, USA',
-    profilePicture: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    email: 'john.doe@example.com',
-    tel: '+234-903-601-331-5'
-  });
-
+  
   const client = false;
   
   const [isEditing, setIsEditing] = useState(false);
-  const [formValues, setFormValues] = useState(user);
-  const [preview, setPreview] = useState(user.profilePicture);
+  const [formValues, setFormValues] = useState({
+    email: user.email || '',
+    fname: user.fname || '',
+    lname: user.lname || '',
+    password: '',
+    user_type: user.user_type || '',
+    mobile_number: user.mobile_number || '',
+    address: user.address || '',
+    city: user.city || '',
+    state: user.state || '',
+    profilePicture: user.profilePicture || '',
+  });
+  // const [preview, setPreview] = useState(user.profilePicture);
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -27,30 +38,43 @@ export default function ClientProfile(){
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreview(reader.result);
-        setFormValues({ ...formValues, profilePicture: reader.result });
+        setFormValues({ ...formValues, profilePicture: file });
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    setUser(formValues);
-    setIsEditing(false);
+   
+
+    setIsLoading(true);
+    try {
+      const userId = localStorage.getItem('userId')
+      
+      await dispatch(editUser({ userId: userId, userData: {...formValues} })).unwrap();
+      setIsEditing(false);
+      window.location.reload();
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
     return(
       <div className="flex flex-col p-4 px-4 py-16 mx-auto mt-4 bg-white 2xl:w-1/2 rounded-2xl md:w-2/3 sm:w-5/6">    
         <div className="flex items-center mb-4 justify-evenly">
           <img
           className="object-cover w-56 h-56 mr-4 rounded-full md:h-72 md:w-72"
-          src={user.profilePicture}
+          src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
           alt="Profile"
           />
           <div className="flex flex-col gap-y-2">
-            <h1 className="text-6xl font-bold">{user.name}</h1>
-            <h1 className="text-xl">{user.location}</h1>
+            <h1 className="text-6xl font-bold">{user.fname}</h1>
+            <h1 className="text-xl">{user.city}</h1>
             <h1 className="text-xl">{user.email}</h1>
-            <h1 className="text-xl">{user.tel}</h1>
+            <h1 className="text-xl">{user.mobile_number}</h1>
           </div>
           {client ?  (<></>) : (<Button
           onClick={() => setIsEditing(!isEditing)}
@@ -60,61 +84,92 @@ export default function ClientProfile(){
         <div>
             {isEditing && (
               <form onSubmit={handleFormSubmit} className="flex flex-col gap-y-3">
-                <div>
-                  <label className="block text-gray-700">Name</label>
-                  <input
+              <div>
+                <label className="block text-gray-700">First Name</label>
+                <input
                   type="text"
-                  name="name"
-                  value={formValues.name}
+                  name="fname"
+                  value={formValues.fname}
                   onChange={handleInputChange}
                   className="w-full p-2 border border-gray-300 rounded-md"
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-700">Location</label>
-                  <input
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700">Last Name</label>
+                <input
                   type="text"
-                  name="location"
-                  value={formValues.location}
+                  name="lname"
+                  value={formValues.lname}
                   onChange={handleInputChange}
                   className="w-full p-2 border border-gray-300 rounded-md"
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-700">Profile Picture</label>
-                  <input
-                  type="file"
-                  accept="image/*"
-                  name="profilePicture"
-                  onChange={handleFileChange}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-700">Email</label>
-                  <input
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700">Email</label>
+                <input
                   type="email"
                   name="email"
                   value={formValues.email}
                   onChange={handleInputChange}
                   className="w-full p-2 border border-gray-300 rounded-md"
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-700">Phone Number</label>
-                  <input
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700">Mobile Number</label>
+                <input
                   type="tel"
-                  name="tel"
-                  value={formValues.tel}
+                  name="mobile_number"
+                  value={formValues.mobile_number}
                   onChange={handleInputChange}
                   className="w-full p-2 border border-gray-300 rounded-md"
-                  />
-                </div>
-                <Button
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700">Address</label>
+                <input
+                  type="text"
+                  name="address"
+                  value={formValues.address}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700">City</label>
+                <input
+                  type="text"
+                  name="city"
+                  value={formValues.city}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700">State</label>
+                <input
+                  type="text"
+                  name="state"
+                  value={formValues.state}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700">Profile Picture</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  name="profilePicture"
+                  onChange={handleFileChange}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                />
+              </div>
+              <Button
                 type="submit"
                 text="Save Changes"
-                />
-              </form>
+                isLoading={isLoading}
+              />
+            </form>
             )}
           </div>
       </div>

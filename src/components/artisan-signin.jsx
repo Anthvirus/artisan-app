@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from '../firebaseConfig';
+import { useDispatch, useSelector } from 'react-redux';
 import { ToastContainer, toast } from 'react-toastify';
+import { loginUser } from '../redux/slices/userSlice';
 import 'react-toastify/dist/ReactToastify.css';
 import { ClipLoader } from 'react-spinners';
 import Button from "./Button";
@@ -15,18 +14,11 @@ function ArtisanSignInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({ email: '', password: '' });
-  const [isLoading, setIsLoading] = useState(false); // State to manage loading status
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        navigate('/artisandashboard');
-      }
-    });
-
-    return () => unsubscribe();
-  }, [navigate]);
+  const { status, error, user } = useSelector((state) => state.user);
 
   function validate() {
     let valid = true;
@@ -46,29 +38,16 @@ function ArtisanSignInForm() {
     setErrors(errors);
     return valid;
   }
-
   async function handleSubmit(event) {
     event.preventDefault();
     if (validate()) {
       setIsLoading(true);
       try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          const userData = docSnap.data();
-          console.log("User data:", userData);
-          navigate('/artisandashboard');
-        } else {
-          console.log("No such document!");
-          toast.error('User not found');
-        }
+        await dispatch(loginUser({ email, password })).unwrap();
+        navigate('/artisandashboard');
       } catch (error) {
         console.error('Error signing in:', error);
-        toast.error(`Error signing in: Login Failed`, {
+        toast.error(`Error signing in: ${error.message || 'Login Failed'}`, {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -78,7 +57,7 @@ function ArtisanSignInForm() {
           progress: undefined,
         });
       } finally {
-        setIsLoading(false); // Stop the loading spinner
+        setIsLoading(false);
       }
     }
   }

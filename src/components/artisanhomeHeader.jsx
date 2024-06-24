@@ -12,7 +12,7 @@ export default function HeaderHome({ userData, }) {
   return (
     <header className="pt-3 bg-gray-200 shadow h-28">
       <div className="flex items-center justify-between px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <h1 className="text-4xl font-semibold text-gray-900">Hi, <span className="font-extrabold">{userData?.firstname}</span></h1>
+        <h1 className="text-4xl font-semibold text-gray-900">Hi, <span className="font-extrabold">{userData?.fname}</span></h1>
         <div className='flex gap-2'>
           <h1 className="flex items-end font-semibold text-gray-900 text-md">Account balance: <b className='text-4xl'>{`$${"0.00"} `||` ${userData?.accountBalance}`}</b></h1>
           <Button type="button" text="Withdraw" style={{ backgroundColor: "inherit", color: "green", boxShadow: 0 }} onClick={toggleWithdrawalPopup} />

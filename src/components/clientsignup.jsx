@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useDispatch, useSelector } from 'react-redux';
+import { signupUser } from '../redux/slices/userSlice';
 import Button from "./Button";
 import InputBox from "./Input";
 
@@ -10,6 +12,9 @@ function UserSignUpForm(){
   const [confirmedPassword, setPasswordTwo] = useState("");
   const [errors, setErrors] = useState({ email: '', lastname:'', firstname : '', selectedPassword: '', confirmedPassword: '' })
   
+  const dispatch = useDispatch();
+  const { status, error } = useSelector((state) => state.user);
+
   function validate(){
   let valid = true;
   let errors = { email: '', selectedPassword: '', firstname: '', lastname: '', confirmedPassword: '' };
@@ -50,10 +55,25 @@ function UserSignUpForm(){
   return valid;
 }
 
-function handleSubmit(event){
+function handleSubmit(event) {
   event.preventDefault();
   if (validate()) {
-    console.log('Form submitted:',  {email, selectedPassword, confirmedPassword, firstname, lastname} );
+    dispatch(
+      signupUser({
+        fname: firstname,
+        lname: lastname,
+        email,
+        password: selectedPassword,
+        user_type: 'client',
+      })
+    );
+    console.log('Form submitted:', {
+      email,
+      selectedPassword,
+      confirmedPassword,
+      firstname,
+      lastname,
+    });
   }
 }
     return (

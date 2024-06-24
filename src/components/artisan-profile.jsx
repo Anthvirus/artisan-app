@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from 'react';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { auth, db } from '../firebaseConfig';
+// import { doc, getDoc, updateDoc } from 'firebase/firestore';
+// import { auth, db } from '../firebaseConfig';
 import { useNavigate } from 'react-router-dom';
 import Button from "./Button";
 import { FaWhatsapp } from 'react-icons/fa';
@@ -24,12 +24,11 @@ const portfolio = [
 const ArtisanProfileCard = ({artisan}) => {
   const [appointments, setAppointments] = useState(false);
   const [tasks, setTasks] = useState([]);
-  const [name, setName] = useState(artisanName);
+  const [name, setName] = useState(artisan.fname);
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
   const [endDate, setEnd] = useState('');
   const [startDate, setStart] = useState('');
-  const { currentUser } = auth;
   const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
   const [showProfileForm, setShowProfileForm] = useState(false);
@@ -80,24 +79,44 @@ const ArtisanProfileCard = ({artisan}) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (currentUser) {
-      const docRef = doc(db, 'users', currentUser.uid);
+    if (artisan._id) {
+      const url = `${baseUrl}/users/${userId}`;
+      const formDataToSend = new FormData();
+    
+      // Append form data
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('mobile_number', formData.phoneNumber);
+      formDataToSend.append('city', formData.location);
+      formDataToSend.append('address', formData.officeAddress);
+     
+      // Append profile picture if it exists
+      if (formData.profilePicture) {
+        formDataToSend.append('picture', formData.profilePicture);
+      }
+    
       try {
-        await updateDoc(docRef, {
-          name: formData.name,
-          email: formData.email,
-          phoneNumber: formData.phoneNumber,
-          whatsappContact: formData.whatsappContact,
-          officeAddress: formData.officeAddress,
-          location: formData.location,
-          profilePicture: formData.profilePicture, // Assuming formData contains the URL of the profile picture
+        const response = await fetch(url, {
+          method: 'PUT',
+          body: formDataToSend,
+          headers: {
+            // Add headers if needed, for example, authorization headers
+            // 'Authorization': 'Bearer your-token'
+          }
         });
-        setShowProfileForm(false);
+    
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+    
+        const result = await response.json();
+        console.log('Profile updated successfully:', result);
       } catch (error) {
-        console.error('Error updating user data:', error);
+        console.error('Error updating profile:', error);
       }
     }
-  };
+    };
+  
 
   const createAppointment = () => {
     setAppointments(false);
@@ -129,25 +148,15 @@ const ArtisanProfileCard = ({artisan}) => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (currentUser) {
-        const docRef = doc(db, 'users', currentUser.uid);
-        try {
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
-            setUserData(docSnap.data());
-          } else {
-            console.log('No such document!');
-          }
-        } catch (error) {
-          console.error('Error fetching user data:', error);
-        }
+      if (artisan._id) {
+       
       } else {
         navigate('/artisansignin');
       }
     };
 
     fetchUserData();
-  }, [currentUser, navigate]);
+  }, [artisan._id, navigate]);
 
   const renderContent = () => {
     switch (activeTab) {
