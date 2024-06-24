@@ -1,28 +1,133 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import Client from './client';
-import client from './client';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import axios from "axios";
+import io from "socket.io-client";
+import { baseUrl } from "../../constants/server";
 
 export default function Chat() {
-  const [message, setMessage] = useState('');
+  const { state } = useLocation();
+  const connection_id = state?.connection_id;
+  const receiver_id = state?.receiver_id;
+  const userId = localStorage.getItem("userId");
+  const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+  const [socket, setSocket] = useState(null);
+  const [receiverProfile, setReceiverProfile] = useState({
+    fname: "",
+    lname: "",
+  });
+  const messagesEndRef = useRef(null);
 
-  function handleChange(e){
-    setMessage(e.target.value)
-  }
+  useEffect(() => {
+    if (!connection_id) {
+      console.error('No connection_id provided');
+      return;
+    }
 
-  function sendChat(){
-    if (message.trim() !== '') {
-      setMessages([...messages, { text: message, timestamp: new Date() }]);
-      setMessage(`${""}`);
-  }
-}
+    // Fetch receiver profile
+    const fetchReceiverProfile = async () => {
+      try {
+        const response = await axios.get(`${baseUrl}/users/${receiver_id}`);
+        setReceiverProfile(response.data);
+      } catch (error) {
+        console.error('Error fetching receiver profile:', error);
+      }
+    };
+
+    fetchReceiverProfile();
+
+    // Initialize socket connection
+    const newSocket = io(baseUrl, {
+      query: { connection_id },
+    });
+    setSocket(newSocket);
+
+    // Listen for initial messages
+    newSocket.on('initial messages', (initialMessages) => {
+      setMessages(initialMessages);
+    });
+
+    // Listen for updated messages
+    newSocket.on('updated messages', (updatedMessages) => {
+      setMessages(updatedMessages);
+    });
+
+    // Clean up the socket connection on component unmount
+    return () => {
+      newSocket.disconnect();
+    };
+  }, [connection_id, receiver_id]);
+
+  useEffect(() => {
+    if (!connection_id || !receiver_id) {
+      console.error("No connection_id or receiver_id provided");
+      return;
+    }
+
+    // Fetch receiver profile
+    const fetchReceiverProfile = async () => {
+      try {
+        console.log("Hereeeeeee");
+        const response = await axios.get(`${baseUrl}/users/${receiver_id}`);
+        setReceiverProfile(response.data);
+      } catch (error) {
+        console.error("Error fetching receiver profile:", error);
+      }
+    };
+
+    fetchReceiverProfile();
+
+    // Initialize socket connection
+    const newSocket = io(baseUrl, {
+      query: { connection_id },
+    });
+    setSocket(newSocket);
+
+    // Listen for initial messages
+    newSocket.on("initial messages", (initialMessages) => {
+      setMessages(initialMessages);
+      
+    });
+
+    // Listen for updated messages
+    newSocket.on("updated messages", (updatedMessages) => {
+      setMessages(updatedMessages);
+      
+    });
+
+    // Clean up the socket connection on component unmount
+    return () => {
+      newSocket.disconnect();
+    };
+  }, [connection_id, receiver_id]);
+
+
+
+  const handleChange = (e) => {
+    setMessage(e.target.value);
+  };
+
+  const sendChat = () => {
+    if (message.trim() !== "") {
+      const newMessage = {
+        sender_id: userId,
+        receiver_id,
+        content: message,
+      };
+
+      // Emit the message to the server
+      socket.emit("chat message", newMessage);
+
+      // Clear the input field
+      setMessage("");
+    }
+  };
   return (
     <div className='w-1/2 p-4 mx-auto mt-4 bg-white rounded-2xl'>
         <div className="flex flex-col h-[40rem] bg-gray-100 rounded-xl shadow-xl">
       {/* Chat Header */}
       <div className="flex items-center justify-between p-4 text-white bg-green-800 rounded-t-xl">
-        <Link to={(client) ? "/clientprofile" : "/artisanprofile" } className="text-xl font-bold">{Client.firstname+ ` `+ Client.lastname}</Link>
+        <Link to={receiverProfile.fname } className="text-xl font-bold">{receiverProfile.lname}</Link>
       </div>
 
       {/* Chat Messages */}
