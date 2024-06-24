@@ -245,8 +245,13 @@ const ArtisanProfileCard = ({artisan}) => {
                 <div className="text-xl text-gray-700 md:text-2xl">{formData.officeAddress || '123 Artisan Street, Office 456'}</div>
               </div>
               {(!artisan) ? (
+                    <div className="flex flex-col gap-2">
+                      <Button text="Add to Connections" onClick={()=>(setShowProfileForm(!showProfileForm))}/>
+                      <Button text="Create Appointment" onClick={()=>(setShowProfileForm(!showProfileForm))}/>
+                    </div>
+              ) : (
                 <Button text="Edit Profile" onClick={()=>(setShowProfileForm(!showProfileForm))}/>
-              ) : (<></>)}
+              )}
             </div>
           );
         }
@@ -284,9 +289,9 @@ const ArtisanProfileCard = ({artisan}) => {
             <div>
               <div className="flex justify-between my-4">
               <h2 className="m-2 text-xl font-bold text-gray-800 rounded-xl md:text-2xl">Reviews</h2>
-              {!artisan || !showReviewForm && (
+              {(!artisan) ? (
                 <Button text="Add Review" onClick={() => setShowReviewForm(true)} />
-              )}
+              ): (<></>)}
               </div>
               <div className="grid grid-cols-1 gap-2 rounded-xl">
                 {allReviews.map((review, index) => (
@@ -309,7 +314,8 @@ const ArtisanProfileCard = ({artisan}) => {
         <div className="flex flex-col gap-2 p-2">
           <div className="flex items-center justify-between my-2">
             <h1 className="text-2xl font-bold">Portfolio</h1>
-            <Button text="Add to portfolio" onClick={handleAddClick} />
+            {(!artisan) ? (<></>
+            ):(<Button text="Add to portfolio" onClick={handleAddClick} />)}
           </div>
 
         {isAdding ? (
