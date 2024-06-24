@@ -8,6 +8,7 @@ import { FaWhatsapp } from 'react-icons/fa';
 import { MdEmail, MdPhone } from 'react-icons/md';
 import ArtisanPortfolioItem from "./artisanportfolioitem";
 import client from "./client";
+import Popup from "./popup";
 
 const reviews = [
   { name: 'John Doe', imageUrl: 'https://via.placeholder.com/40', review: 'Great service!' },
@@ -21,6 +22,13 @@ const portfolio = [
 ]
 
 const ArtisanProfileCard = ({artisan}) => {
+  const [appointments, setAppointments] = useState(false);
+  const [tasks, setTasks] = useState([]);
+  const [name, setName] = useState(artisanName);
+  const [description, setDescription] = useState('');
+  const [amount, setAmount] = useState('');
+  const [endDate, setEnd] = useState('');
+  const [startDate, setStart] = useState('');
   const { currentUser } = auth;
   const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
@@ -89,6 +97,11 @@ const ArtisanProfileCard = ({artisan}) => {
         console.error('Error updating user data:', error);
       }
     }
+  };
+
+  const createAppointment = () => {
+    setAppointments(false);
+    console.log(tasks);
   };
 
   const handleCancel = () => {
@@ -224,6 +237,69 @@ const ArtisanProfileCard = ({artisan}) => {
         } else {
           return (
             <div className="flex flex-col items-center justify-center p-3 py-16 bg-gray-200 overfl0ow-y-auto md:py-0 md:gap-8 md:flex-row gap-y-12">
+            <Popup show={appointments} onClose={createAppointment}>
+          <h1 className="text-3xl font-semibold">Create Appointment</h1>
+          <form className="flex flex-col gap-4 my-4">
+            <div className="flex flex-col items-start gap-2">
+              <label className="text-lg">Name of Artisan:</label>
+              <input
+                name="name"
+                type="text"
+                className="items-center w-full h-12 p-2 text-xl rounded-md"
+                required
+                onChange={(e) => setName(e.target.value)}
+                value={name}
+              />
+            </div>
+            <div className="flex flex-col items-start gap-2">
+              <label className="text-lg">
+                Describe the task the artisan is to do:
+              </label>
+              <textarea
+                name="description"
+                type="text"
+                className="items-center w-full h-24 p-2 text-xl rounded-md"
+                required
+                onChange={(e) => setDescription(e.target.value)}
+                value={description}
+              />
+            </div>
+            <div className="flex my-2 gap-x-4">
+              <div className="flex items-center justify-center gap-x-2">
+                <label className="text-xl">Start Date:</label>
+                <input
+                  name="start_date"
+                  type="date"
+                  className="items-center h-12 p-2 text-xl rounded-md w-72"
+                  required
+                  onChange={(e) => setStart(e.target.value)}
+                />
+              </div>
+              <div className="flex items-center justify-center gap-x-2">
+                <label className="text-xl">End Date:</label>
+                <input
+                  name="end_date"
+                  type="date"
+                  className="items-center h-12 p-2 text-xl rounded-md w-72"
+                  required
+                  onChange={(e) => setEnd(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 my-2">
+              <label className="text-xl">Amount Agreed $:</label>
+              <input
+                name="amount"
+                type="text"
+                className="items-center h-12 p-2 text-xl rounded-md w-96"
+                required
+                onChange={(e) => setAmount(e.target.value)}
+                value={amount}
+              />
+            </div>
+            <Button text="Submit Appointment" onClick={submitAppointment} />
+          </form>
+        </Popup>
               <div className="flex-shrink-0">
                 <img className="mx-auto rounded-full max-w-72 max-h-72 md:w-96 md:h-96 sm:mx-0" srcset={userData?.profilePicture} alt="Profile" />
               </div>
