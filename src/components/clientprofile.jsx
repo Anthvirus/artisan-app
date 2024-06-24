@@ -52,10 +52,10 @@ export default function ClientProfile(){
             <h1 className="text-xl">{user.email}</h1>
             <h1 className="text-xl">{user.tel}</h1>
           </div>
-          {client ? (<Button
+          {client ?  (<></>) : (<Button
           onClick={() => setIsEditing(!isEditing)}
           text={isEditing ? 'Cancel' : 'Edit Profile'}
-          />) : (<></>)}
+          />)}
         </div>
         <div>
             {isEditing && (

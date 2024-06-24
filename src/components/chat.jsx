@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Client from './client';
+import client from './client';
 
 export default function Chat() {
   const [message, setMessage] = useState('');
@@ -21,7 +22,7 @@ export default function Chat() {
         <div className="flex flex-col h-[40rem] bg-gray-100 rounded-xl shadow-xl">
       {/* Chat Header */}
       <div className="flex items-center justify-between p-4 text-white bg-green-800 rounded-t-xl">
-        <Link to="/" className="text-xl font-bold">{Client.firstname+ ` `+ Client.lastname}</Link>
+        <Link to={(client) ? "/clientprofile" : "/artisanprofile" } className="text-xl font-bold">{Client.firstname+ ` `+ Client.lastname}</Link>
       </div>
 
       {/* Chat Messages */}

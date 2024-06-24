@@ -4,7 +4,8 @@ import { Link } from "react-router-dom";
 export default function AppointmentCard(task){
     return (
         <>
-    <div className="w-full p-3 mx-auto my-2 overflow-hidden bg-gray-100 rounded-lg shadow-lg min-h-80">
+          <div className='w-1/2 h-auto p-4 mx-auto mt-4 bg-white rounded-2xl max-h-[40rem]'>
+            <div className="flex flex-col w-full p-3 mx-auto my-2 overflow-hidden bg-gray-100 rounded-lg shadow-lg max-h-64">
       <div className="p-4">
         <div className="mb-2">
           <Link to="/" className="text-3xl font-extrabold text-gray-800">{task.artisanName}</Link>
@@ -26,7 +27,8 @@ export default function AppointmentCard(task){
         </div>
       </div>
       <Button text="Cancel Appointment" onClick={task.delete}/>
-    </div>
+          </div>
+        </div>
         </>
     )
 }
