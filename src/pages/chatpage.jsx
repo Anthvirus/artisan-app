@@ -1,7 +1,6 @@
 import Chat from '../components/chat';
 import {useState, useEffect} from 'react';
-import Client from '../components/client';
-import { Link, useLocation } from 'react-router-dom';
+import {useLocation } from 'react-router-dom';
 import Header from '../components/connectionheader';
 
 export default function ChatPage() {
@@ -13,7 +12,9 @@ export default function ChatPage() {
     fname: "",
     lname: "",
   });
-  
+
+  const userId = localStorage.getItem('userId') // Get the userId from the Redux state
+  console.log('User',userId)
 
   useEffect(() => {
     if (!connection_id) {
@@ -35,7 +36,7 @@ export default function ChatPage() {
   [connection_id, receiver_id]);
   return (
     <div className="min-h-screen bg-gray-200">
-      <Header heading={`Chat with ${receiverProfile.fname+" "+ receiverProfile.lname}`} link="Back to Home" href="/artisandashboard"/>
+      <Header heading={`Chat with ${receiverProfile.fname+" "+ receiverProfile.lname}`} link="Back to Home" href={"/artisandashboard" || "/clienthome" }/>
       <Chat connection_id={connection_id} receiver_id={receiver_id}/>
     </div>
   );
