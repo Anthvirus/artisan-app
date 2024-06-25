@@ -1,12 +1,12 @@
 import Header from '../../components/connectionheader';
 import ArtisanProfileCard from '../../components/artisan-profile';
 import { useState, useEffect } from 'react';
+import { baseUrl } from '../../../constants/server';
 
 // export default function ArtisanHome({artisan}) {
 
-export default function ArtisanHome() {
-  const [artisan, setArtisanData] = useState({
-    fname: "",})
+export default function ArtisanMyProfile() {
+  const [artisan, setArtisanData] = useState({})
 
 
 

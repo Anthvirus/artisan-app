@@ -11,7 +11,7 @@ import useNavigation from './navigation';
 
 const userNavigation = [
   { name: 'Transaction History', to: '/transactions' },
-  { name: 'Your Profile', to: '/artisanprofile' },
+  { name: 'Your Profile', to: '/artisanmyprofile' },
   { name: 'Sign out', to: "#" },
 ];
 

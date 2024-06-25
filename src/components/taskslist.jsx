@@ -30,6 +30,36 @@ export default function TasksList() {
 
     fetchAppointments();
   }, [userId]);
+  const deleteAppointment = async (appointmentId) => {
+    try {
+      const response = await axios.delete(`${baseUrl}/appointments/${appointmentId}`);
+      if (response.status === 200) {
+        setTasks((prevTasks) => prevTasks.filter(task => task._id !== appointmentId));
+        console.log('Appointment deleted:', appointmentId);
+      } else {
+        console.error('Error deleting appointment:', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error deleting appointment:', error);
+    }
+  };
+
+  const completeAppointment = async (appointmentId) => {
+    try {
+      const response = await axios.patch(`${baseUrl}/appointments/${appointmentId}`, { iscomplete: true });
+      if (response.status === 200) {
+        setTasks((prevTasks) => prevTasks.map(task => 
+          task._id === appointmentId ? { ...task, iscomplete: true } : task
+        ));
+        console.log('Appointment marked as complete:', appointmentId);
+      } else {
+        console.error('Error marking appointment as complete:', response.data.message);
+      }
+    } catch (error) {
+      console.error('Error marking appointment as complete:', error);
+    }
+  };
+
 
   return (
           <div className='w-full mx-2 p-4 md:mx-auto mt-2 bg-gray-100 lg:w-1/2 rounded-xl max-h-[30rem] overflow-y-auto'>
@@ -45,7 +75,9 @@ export default function TasksList() {
                   startDate={task.start_date}
                   endDate={task.end_date}
                   taskDescription={task.description}
-                  // delete={deleteAppointment}
+                  taskCompleted={task.iscomplete}
+                  delete={deleteAppointment(task._id)}
+                  complete={completeAppointment(task._id)}
                 />
               ))
             )}

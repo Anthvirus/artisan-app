@@ -23,8 +23,8 @@ export default function Landing(){
     return (
         <>
         <div className=" bg-gray-200 min-h-[70rem] py-20">
-        <div>
-          A Marketplace for artisan is meant to bring artisans right to potential customers and 
+        <div className="flex justify-center align-center text-xl font-bold"> 
+          A Marketplace for artisan is meant to bring artisans right to potential customers
         </div>
         <div className="px-4 mx-auto bg-white border max-w-7xl sm:px-6 lg:px-8">
           <div className="max-w-2xl py-16 mx-auto sm:py-24 lg:max-w-none lg:py-32">
