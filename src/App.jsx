@@ -9,6 +9,7 @@ import UserSignUpPage from './pages/clients/user-signup-page';
 import UserSignInPage from './pages/clients/user-signin-page';
 import UserProfilePage from './pages/clients/userprofilepage';
 import ArtisanProfileForClient from './pages/clients/artisanprofile.jsx';
+import ArtisanMyProfile from './pages/artisan/artisan-profilepage.jsx';
 import ChatPage from './pages/chatpage';
 import TransactionPage from './pages/transactionpage';
 import SectionPage from "./pages/sectionpage.jsx";
@@ -23,7 +24,9 @@ function App() {
       <Route path='/' element={<SectionPage />} />
         <Route path='/artisandashboard' element={<ArtisanHome />} />
         <Route path='/artisansignin' element={<ArtisanSignInPage />} />
+        <Route path='/artisanmyprofile' element={<ArtisanMyProfile />} />
         <Route path='/artisanprofile' element={<ArtisanProfileForClient />} />
+
         <Route path='/artisansignup' element={<ArtisanSignUpPage />} />
         <Route path='/usersignup' element={<UserSignUpPage />} />
         <Route path='/usersignin' element={<UserSignInPage />} />

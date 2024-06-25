@@ -25,8 +25,13 @@ export default function ArtisanTaskCard(task){
           <span className="font-extrabold text-gray-800">${task.amountAgreed}</span>
         </div>
       </div>
-      <Button text="Finished" onClick={task.delete}/>
-    </div>
+      <div className="flex justify-end gap-5">
+      <Button disabled={true} style={{backgroundColor: "#924000"}} text={task.completed?"Finished":"Pending"}/>
+      <Button  danger={true} text="Reject" onClick={task.delete}/>
+      <Button  danger={false} text="Mark as Completed" onClick={task.complete}/>
+  
+      </div>
+      </div>
         </>
     )
 }

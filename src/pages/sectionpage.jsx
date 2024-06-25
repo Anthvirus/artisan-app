@@ -1,4 +1,4 @@
-//import Sections from "../../components/sections";
+import Sections from "../components/sections"
 //import Header from "../../components/Header";
 
 export default function SectionPage() {
@@ -6,6 +6,7 @@ export default function SectionPage() {
         <>
             <div className="box-border">
                 {/* <Header/> */}
+                <Sections />
                 
             </div>
         </>

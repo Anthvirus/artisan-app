@@ -1,38 +1,18 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from 'react';
-// import { doc, getDoc, updateDoc } from 'firebase/firestore';
-// import { auth, db } from '../firebaseConfig';
-import { useNavigate } from 'react-router-dom';
 import Button from "./Button";
 import { FaWhatsapp } from 'react-icons/fa';
 import { MdEmail, MdPhone } from 'react-icons/md';
 import ArtisanPortfolioItem from "./artisanportfolioitem";
 import client from "./client";
-import Popup from "./popup";
+import avatar from '../assets/images/male_avatar.svg'
 
-const reviews = [
-  { name: 'John Doe', imageUrl: 'https://via.placeholder.com/40', review: 'Great service!' },
-  { name: 'Jane Smith', imageUrl: 'https://via.placeholder.com/40', review: 'Very professional and reliable.' },
-  { name: 'Jane Smith', imageUrl: 'https://via.placeholder.com/40', review: 'Very professional and reliable.' },
-  { name: 'Jane Smith', imageUrl: 'https://via.placeholder.com/40', review: 'Very professional and reliable.' },
-];
-
-const portfolio = [
-  {clientName: 'John Smith', src: 'https://via.placeholder.com/40', description : "Wall Mounting of 32 inches television", date: "23/02/1987"}
-]
 
 const ArtisanProfileCard = ({artisan}) => {
-  const [appointments, setAppointments] = useState(false);
-  const [tasks, setTasks] = useState([]);
-  const [name, setName] = useState(artisan.fname);
-  const [description, setDescription] = useState('');
-  const [amount, setAmount] = useState('');
-  const [endDate, setEnd] = useState('');
-  const [startDate, setStart] = useState('');
+  console.log('arisan', artisan)
+
   const [userData, setUserData] = useState(null);
-  const navigate = useNavigate();
   const [showProfileForm, setShowProfileForm] = useState(false);
-  const [showReviewForm, setShowReviewForm] = useState(false);
   const [formData, setFormData] = useState({ 
       name: "",
       email: "",
@@ -42,9 +22,8 @@ const ArtisanProfileCard = ({artisan}) => {
       location: "",  
     }
   );
-  const [reviewFormData, setReviewFormData] = useState({ rating: '', review: '' });
+
   const [activeTab, setActiveTab] = useState('profile'); 
-  const [allReviews, setAllReviews] = useState(reviews)
   const [isAdding, setIsAdding] = useState(false);
   const [portfolioItems, setPortfolioItems] = useState([
     {
@@ -118,45 +97,16 @@ const ArtisanProfileCard = ({artisan}) => {
     };
   
 
-  const createAppointment = () => {
-    setAppointments(false);
-    console.log(tasks);
-  };
+ 
 
   const handleCancel = () => {
     setFormData(artisan);
     setShowProfileForm(false);
   };
 
-  const handleReviewChange = (e) => {
-    const { name, value } = e.target;
-    setReviewFormData({ ...reviewFormData, [name]: value });
-  };
 
-  const handleReviewSave = () => {
-    const newReview = {
-      name: client.firstname +" "+ client.lastname,
-      imageUrl: client.imageUrl,
-      review: reviewFormData.review,
-      rating: reviewFormData.rating
-    };
-    setAllReviews([ newReview, ...allReviews]);
-    setShowReviewForm(false);
-    setReviewFormData({ rating: '', review: '' });
-    console.log(allReviews);
-  };
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (artisan._id) {
-       
-      } else {
-        navigate('/artisansignin');
-      }
-    };
 
-    fetchUserData();
-  }, [artisan._id, navigate]);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -246,151 +196,27 @@ const ArtisanProfileCard = ({artisan}) => {
         } else {
           return (
             <div className="flex flex-col items-center justify-center p-3 py-16 bg-gray-200 overfl0ow-y-auto md:py-0 md:gap-8 md:flex-row gap-y-12">
-            <Popup show={appointments} onClose={createAppointment}>
-          <h1 className="text-3xl font-semibold">Create Appointment</h1>
-          <form className="flex flex-col gap-4 my-4">
-            <div className="flex flex-col items-start gap-2">
-              <label className="text-lg">Name of Artisan:</label>
-              <input
-                name="name"
-                type="text"
-                className="items-center w-full h-12 p-2 text-xl rounded-md"
-                required
-                onChange={(e) => setName(e.target.value)}
-                value={name}
-              />
-            </div>
-            <div className="flex flex-col items-start gap-2">
-              <label className="text-lg">
-                Describe the task the artisan is to do:
-              </label>
-              <textarea
-                name="description"
-                type="text"
-                className="items-center w-full h-24 p-2 text-xl rounded-md"
-                required
-                onChange={(e) => setDescription(e.target.value)}
-                value={description}
-              />
-            </div>
-            <div className="flex my-2 gap-x-4">
-              <div className="flex items-center justify-center gap-x-2">
-                <label className="text-xl">Start Date:</label>
-                <input
-                  name="start_date"
-                  type="date"
-                  className="items-center h-12 p-2 text-xl rounded-md w-72"
-                  required
-                  onChange={(e) => setStart(e.target.value)}
-                />
-              </div>
-              <div className="flex items-center justify-center gap-x-2">
-                <label className="text-xl">End Date:</label>
-                <input
-                  name="end_date"
-                  type="date"
-                  className="items-center h-12 p-2 text-xl rounded-md w-72"
-                  required
-                  onChange={(e) => setEnd(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="flex items-center gap-2 my-2">
-              <label className="text-xl">Amount Agreed $:</label>
-              <input
-                name="amount"
-                type="text"
-                className="items-center h-12 p-2 text-xl rounded-md w-96"
-                required
-                onChange={(e) => setAmount(e.target.value)}
-                value={amount}
-              />
-            </div>
-            <Button text="Submit Appointment" onClick={submitAppointment} />
-          </form>
-        </Popup>
+
               <div className="flex-shrink-0">
-                <img className="mx-auto rounded-full max-w-72 max-h-72 md:w-96 md:h-96 sm:mx-0" srcset={userData?.profilePicture} alt="Profile" />
+                <img className="mx-auto rounded-full max-w-72 max-h-72 md:w-96 md:h-96 sm:mx-0" srcset={avatar} alt="Profile" />
               </div>
               <div className="flex flex-col gap-3 text-left md:ml-4">
-                <div className="text-3xl font-bold leading-tight md:text-5xl">{formData.name || `${userData?.firstname} ${userData?.lastname}`}</div>
-                <div className="flex items-center gap-x-4">
-                  <FaWhatsapp className="w-8 h-8 text-green-500" />
-                  <Link to={`https://wa.me/${formData.whatsapp}`} className="text-xl text-gray-700 md:text-2xl">{formData.whatsapp || '+1234567890'}</Link>
-                </div>
+                <div className="text-3xl font-bold leading-tight md:text-5xl">{`${artisan.fname} ${artisan.lname}`}</div>
+                
                 <div className="flex items-center gap-x-4">
                   <MdEmail className="w-8 h-8 text-red-500" />
-                  <Link to={`mailto:${formData.email}`} className="text-xl text-gray-700 md:text-2xl">{formData.email || userData?.email}</Link>
+                  <Link to={`mailto:${artisan.email}`} className="text-xl text-gray-700 md:text-2xl">{artisan.email}</Link>
                 </div>
                 <div className="flex items-center gap-x-4">
                   <MdPhone className="w-8 h-8 text-green-700" />
-                  <Link to={`tel:${formData.phone}`} className="text-xl text-gray-700 md:text-2xl">{formData.whatsapp || '+1234567890'}</Link>
+                  <Link to={`tel:${artisan.mobile_number}`} className="text-xl text-gray-700 md:text-2xl">{artisan.mobile_number || 'Edit Profile to Set'}</Link>
                 </div>
-                <div className="text-xl text-gray-700 md:text-2xl">{formData.location || 'City, Country'}</div>
-                <div className="text-xl text-gray-700 md:text-2xl">{formData.officeAddress || '123 Artisan Street, Office 456'}</div>
+                <div className="text-xl text-gray-700 md:text-2xl">{artisan.city }</div>
+                <div className="text-xl text-gray-700 md:text-2xl">{artisan.address}</div>
               </div>
-              {(!artisan) ? (
-                    <div className="flex flex-col gap-2">
-                      <Button text="Add to Connections" onClick={()=>(setShowProfileForm(!showProfileForm))}/>
-                      <Button text="Create Appointment" onClick={()=>(setShowProfileForm(!showProfileForm))}/>
-                    </div>
-              ) : (
-                <Button text="Edit Profile" onClick={()=>(setShowProfileForm(!showProfileForm))}/>
-              )}
-            </div>
-          );
-        }
-      case 'reviews':
-        if (showReviewForm) {
-          return (
-            <form className="w-4/5 p-4 mx-auto my-auto bg-white border rounded-xl">
-              <h2 className="mb-4 text-xl font-bold md:text-2xl">Add Review</h2>
-              <div className="">
-              <p>What Rating would you give this artisan:</p>
-                <select name="rating" value={reviewFormData.rating} onChange={handleReviewChange} className="w-full h-12 my-2 border">
-                  <option value="1" className="h-24">-</option>
-                  <option value="1" className="h-24">1</option>
-                  <option value="2" className="h-24">2</option>
-                  <option value="3" className="h-24">3</option>
-                  <option value="4" className="h-24">4</option>
-                  <option value="5" className="h-24">5</option>
-                </select>
-              </div>
-              <textarea
-                placeholder="Review"
-                name="review"
-                value={reviewFormData.review}
-                onChange={handleReviewChange}
-                className="w-full h-32 px-3 py-2 mb-4 bg-gray-200 rounded"
-              />
-              <div className="flex gap-4">
-                <button type="button" onClick={() => setShowReviewForm(false)} className="flex items-center justify-center w-full px-4 py-2 mt-4 text-white bg-red-700 rounded md:w-auto hover:bg-red-600">Cancel</button>
-                <button type="button" onClick={handleReviewSave} className="flex items-center justify-center w-full px-4 py-2 mt-4 text-white bg-green-800 rounded md:w-auto hover:bg-green-700">Save</button>
-              </div>
-            </form>
-          );
-        } else {
-          return (
-            <div>
-              <div className="flex justify-between my-4">
-              <h2 className="m-2 text-xl font-bold text-gray-800 rounded-xl md:text-2xl">Reviews</h2>
-              {(!artisan) ? (
-                <Button text="Add Review" onClick={() => setShowReviewForm(true)} />
-              ): (<></>)}
-              </div>
-              <div className="grid grid-cols-1 gap-2 rounded-xl">
-                {allReviews.map((review, index) => (
-                  <div key={index} className="w-full p-4 bg-gray-100 h-36 rounded-xl">
-                    <div className="flex items-center h-full mb-2">
-                      <img className="w-24 h-24 mr-4 rounded-full" src={review.imageUrl} alt={review.name} />
-                      <div>
-                        <p className="text-lg font-medium text-gray-800 md:text-xl">{review.name}</p>
-                        <p className="text-gray-600">{review.review}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              
+                <Button text="Update Profile" onClick={()=>(setShowProfileForm(!showProfileForm))}/>
+            
             </div>
           );
         }
@@ -435,9 +261,6 @@ const ArtisanProfileCard = ({artisan}) => {
       <div className="grid min-h-16 md:grid-cols-3">
         <button onClick={() => setActiveTab('profile')} className={`col-span-1 px-4 py-2 ${activeTab === 'profile' ? 'bg-green-800 text-white  md:rounded-tl-xl' : 'text-gray-700 hover:bg-green-700 hover:text-white'}`}>
           Profile
-        </button>
-        <button onClick={() => setActiveTab('reviews')} className={`col-span-1 px-4 py-2 ${activeTab === 'reviews' ? 'bg-green-800 text-white' : 'text-gray-700 hover:bg-green-700 hover:text-white'}`}>
-          Reviews
         </button>
         <button onClick={() => setActiveTab('portfolio')} className={`col-span-1 px-4 py-2 ${activeTab === 'portfolio' ? 'bg-green-800 text-white md:rounded-tr-xl' : 'text-gray-700 hover:bg-green-700 hover:text-white'}`}>
           Portfolio
