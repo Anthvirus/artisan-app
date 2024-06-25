@@ -15,7 +15,7 @@ const userNavigation = [
   { name: 'Appointments', to: '/appointments' },
   { name: 'Transaction History', to: '/transactions' },
   { name: 'Your Profile', to: '/clientprofile' },
-  { name: 'Sign out', to: "/usersignin" },
+  { name: 'Sign out', to: "/" },
 ];
 
 function classNames(...classes) {
@@ -36,7 +36,7 @@ export default function ClientNavBar({userData, toggleHome, toggleConnections}) 
   const handleSignOut = async () => {
     try {
       dispatch(logout)
-      navigate('/usersignin');
+      navigate('/');
     } catch (error) {
       console.error('Error signing out:', error);
     }

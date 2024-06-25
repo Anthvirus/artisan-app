@@ -13,7 +13,7 @@ import { logout } from '../redux/slices/userSlice';
 const userNavigation = [
   { name: 'Transaction History', to: '/transactions' },
   { name: 'Your Profile', to: '/artisanmyprofile' },
-  { name: 'Sign out', to: "/artisansignin" },
+  { name: 'Sign out', to: "/" },
 ];
 
 function classNames(...classes) {
@@ -34,7 +34,7 @@ export default function NavBar({userData, toggleHome, toggleConnections}) {
   const handleSignOut = async () => {
     try {
       dispatch(logout);
-      navigate('/artisansignin');
+      navigate('/');
     } catch (error) {
       console.error('Error signing out:', error);
     }
