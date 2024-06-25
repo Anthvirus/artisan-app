@@ -93,6 +93,7 @@ const userSlice = createSlice({
       state.userId = null;
       localStorage.removeItem('token'); // Remove the token from storage
       localStorage.removeItem('userId');
+      localStorage.removeItem('user_type');
     },
   },
   extraReducers: (builder) => {
@@ -107,6 +108,7 @@ const userSlice = createSlice({
         const decodedToken = jwtDecode(action.payload.token); // Decode the token
         state.userId = decodedToken.id; // Store the user ID in the state
         localStorage.setItem('userId', decodedToken.id);
+        localStorage.setItem('user_type', action.payload.user_type);
         console.log('Not Here', decodedToken)
         console.log('Not Here', state.userId)
       })

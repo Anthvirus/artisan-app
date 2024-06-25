@@ -15,8 +15,11 @@ export default function TasksList() {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
+        //start loading
         const response = await axios.get(`${baseUrl}/appointments/artisan/${userId}`);
+        //end loading
         if (response.status === 200) {
+          
           setTasks(response.data);
           console.log('Appointments fetched:', response.data);
         } else {
