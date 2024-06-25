@@ -10,17 +10,34 @@ export default function ClientProfile({user}){
   const client = false;
   
   const [isEditing, setIsEditing] = useState(false);
+  
   const [formValues, setFormValues] = useState({
-    email: user.email,
-    fname: user.fname,
-    lname: user.lname,
-    user_type: user.user_type,
-    mobile_number: user.mobile_number,
-    address: user.address,
-    city: user.city,
-    state: user.state,
-    profilePicture: user.profilePicture,
+    email: '',
+    fname: '',
+    lname: '',
+    user_type: '',
+    mobile_number: '',
+    address: '',
+    city: '',
+    state: '',
+    profilePicture: '',
   });
+
+  useEffect(() => {
+    if (user) {
+      setFormValues({
+        email: user.email || '',
+        fname: user.fname || '',
+        lname: user.lname || '',
+        user_type: user.user_type || '',
+        mobile_number: user.mobile_number || '',
+        address: user.address || '',
+        city: user.city || '',
+        state: user.state || '',
+        profilePicture: user.profilePicture || '',
+      });
+    }
+  }, [user]);
   // const [preview, setPreview] = useState(user.profilePicture);
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();

@@ -8,6 +8,8 @@ import { MdEmail, MdPhone } from 'react-icons/md';
 import ArtisanPortfolioItem from "./artisanportfolioitem";
 import client from "./client";
 import avatar from '../assets/images/male_avatar.svg'
+import axios from 'axios'
+import { baseUrl } from "../../constants/server";
 
 
 const ArtisanProfileCard = ({artisan}) => {
@@ -15,59 +17,112 @@ const ArtisanProfileCard = ({artisan}) => {
   console.log('arisan', artisan)
   const [showProfileForm, setShowProfileForm] = useState(false);
   const [formValues, setFormValues] = useState({
-    email: artisan.email,
-    fname: artisan.fname,
-    lname: artisan.lname,
-    user_type: artisan.user_type,
-    mobile_number: artisan.mobile_number,
-    address: artisan.address,
-    city: artisan.city,
-    state: artisan.state,
-    profilePicture: artisan.profilePicture,
+    email: '',
+    fname: '',
+    lname: '',
+    user_type: '',
+    mobile_number: '',
+    address: '',
+    city: '',
+    state: '',
+    profilePicture: '',
   });
+
+  useEffect(() => {
+    if (artisan) {
+      setFormValues({
+        email: artisan.email || '',
+        fname: artisan.fname || '',
+        lname: artisan.lname || '',
+        user_type: artisan.user_type || '',
+        mobile_number: artisan.mobile_number || '',
+        address: artisan.address || '',
+        city: artisan.city || '',
+        state: artisan.state || '',
+        profilePicture: artisan.profilePicture || '',
+      });
+    }
+  }, [artisan]);
 
   const [activeTab, setActiveTab] = useState('profile'); 
   const [isAdding, setIsAdding] = useState(false);
-  const [portfolioItems, setPortfolioItems] = useState([
-    {
-      image: 'https://images.unsplash.com/photo-1503602642458-232111445657?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8aGFuZHJhZnQlMjBzdG9vbHxlbnwwfHwwfHx8MA%3D%3D',
-      description: 'Handcrafted wooden table with intricate carvings.',
-      date: '2024-05-15',
-      client: `${client.firstName} ${client.lastName}`
-    }
-  ]);
+  const [portfolioItems, setPortfolioItems] = useState([]);
+  useEffect(() => {
+    // Fetch portfolio items from the backend
+    const artisan_id = localStorage.getItem('userId');
+    const fetchPortfolioItems = async () => {
+      try {
+        const response = await axios.get(`${baseUrl}/portfolios/${artisan_id}`);
+        setPortfolioItems(response.data);
+      } catch (error) {
+        console.error('Error fetching portfolio items:', error);
+        setError('Error fetching portfolio items');
+      }
+    };
+
+    fetchPortfolioItems();
+  }, []);
 
   const handleAddClick = () => {
     setIsAdding(true);
   };
 
-  const handlePortfolioSave = (e) => {
-    e.preventDefault();
-    const formValues = new FormData(e.target);
-    const newPortfolioItem = {
-      image: formValues.get('image'),
-      description: formValues.get('description'),
-      date: new Date().toISOString().split('T')[0], // Current date
-      client: `${client.firstname} ${client.lastname}`
-    };
-    setPortfolioItems([...portfolioItems, newPortfolioItem]);
-    setIsAdding(false);
-  };
+ 
+
   
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormValues({ ...formValues, [name]: value });
   };
-
+  const [file, setFile] = useState(null);
+  const [description, setDescription] = useState('');
+  const [title, setTitle] = useState('');
+  const [error, setError] = useState('');
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result);
-        setFormValues({ ...formValues, profilePicture: file });
-      };
-      reader.readAsDataURL(file);
+    setFile(file);
+    // if (file) {
+    //   const reader = new FileReader();
+    //   reader.onloadend = () => {
+    //     setPreview(reader.result);
+    //     setFormValues({ ...formValues, profilePicture: file });
+    //   };
+    //   reader.readAsDataURL(file);
+    // }
+  };
+  const handleDescriptionChange = (e) => {
+    setDescription(e.target.value);
+  };
+  const handleTitleChange = (e) => {
+    setTitle(e.target.value);
+  };
+  const handlePortfolioSave = async (e) => {
+    e.preventDefault();
+
+    if (!file || !description) {
+      setError('Both file and description are required.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('attachment', file);
+    formData.append('description', description);
+    formData.append('user_id', artisan._id);  // Assuming artisan has an id property
+    formData.append('title', title); // Replace with your logic to get the title
+
+    try {
+      const response = await axios.post(`${baseUrl}/portfolios/`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      if (response.status === 201) {
+        // Handle successful portfolio creation, e.g., refresh portfolio list
+        setIsAdding(false);
+      }
+    } catch (error) {
+      setError(error.message);
     }
   };
 
@@ -222,34 +277,61 @@ const ArtisanProfileCard = ({artisan}) => {
         }
       case 'portfolio':
         return (
-        <div className="flex flex-col gap-2 p-2">
-          <div className="flex items-center justify-between my-2">
-            <h1 className="text-2xl font-bold">Portfolio</h1>
-            {(!artisan) ? (<></>
-            ):(<Button text="Add to portfolio" onClick={handleAddClick} />)}
+          <div className="flex flex-col gap-2 p-2">
+            <div className="flex items-center justify-between my-2">
+              <h1 className="text-2xl font-bold">Portfolio</h1>
+              {artisan && (
+                <Button text="Add to portfolio" onClick={handleAddClick} />
+              )}
+            </div>
+      
+            {isAdding ? (
+              <form onSubmit={handlePortfolioSave} className="flex flex-col gap-4 p-4 bg-white rounded-xl">
+                {error && <p className="text-red-600">{error}</p>}
+                <input
+                  type="text"
+                  name="title"
+                  onChange={handleTitleChange}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                />
+                <input
+                  type="file"
+                  name="image"
+                  accept="image/*"
+                  className="p-2 border rounded"
+                  onChange={handleFileChange}
+                  required
+                />
+                <textarea
+                  type="text"
+                  name="description"
+                  placeholder="Description"
+                  className="p-2 border rounded h-36"
+                  value={description}
+                  onChange={handleDescriptionChange}
+                  required
+                />
+                <div className="flex gap-4">
+                  <button type="button" onClick={() => setIsAdding(false)} className="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700">
+                    Cancel
+                  </button>
+                  <button type="submit" className="px-4 py-2 text-white bg-green-700 rounded hover:bg-green-800">
+                    Save
+                  </button>
+                </div>
+              </form>
+            ) : (
+              portfolioItems.map((item, index) => (
+                <ArtisanPortfolioItem
+                  key={index}
+                  image={item.attachments}
+                  description={item.description}
+                  date={item.title}
+                  
+                />
+              ))
+            )}
           </div>
-
-        {isAdding ? (
-          <form onSubmit={handlePortfolioSave} className="flex flex-col gap-4 p-4 bg-white rounded-xl">
-          <input type="file" name="image" accept="image/*" className="p-2 border rounded" required />
-          <textarea type="text" name="description" placeholder="Description" className="p-2 border rounded h-36" required />
-          <div className="flex gap-4">
-          <button type="button" onClick={()=> (setIsAdding(false))}  className="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700">Cancel</button>
-          <button type="submit" className="px-4 py-2 text-white bg-green-700 rounded hover:bg-green-800">Save</button>
-          </div>
-          </form>
-        ) : (
-          portfolioItems.map((item, index) => (
-          <ArtisanPortfolioItem
-            key={index}
-            image={item.image}
-            description={item.description}
-            date={item.date}
-            client={item.client}
-          />
-        ))
-        )}
-        </div>
       );
       default:
         return null;

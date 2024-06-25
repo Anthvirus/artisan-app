@@ -26,15 +26,26 @@ const ArtisanProfileCardForClient = ({ artisan }) => {
   const [isAlreadyConnected, setIsAlreadyConnected] = useState(false);
   const [connectionId, setConnectionId] = useState(null);
 
-  const [portfolioItems, setPortfolioItems] = useState([
-    {
-      image:
-        "https://images.unsplash.com/photo-1503602642458-232111445657?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8aGFuZHJhZnQlMjBzdG9vbHxlbnwwfHwwfHx8MA%3D%3D",
-      description: "Handcrafted wooden table with intricate carvings.",
-      date: "2024-05-15",
-      client: `${client.firstName} ${client.lastName}`,
-    },
-  ]);
+  const [portfolioItems, setPortfolioItems] = useState([]);
+  useEffect(() => {
+    // Fetch portfolio items from the backend
+    const artisan_id = localStorage.getItem('userId');
+    const fetchPortfolioItems = async () => {
+      try {
+        const response = await axios.get(`${baseUrl}/portfolios/${artisan_id}`);
+        setPortfolioItems(response.data);
+      } catch (error) {
+        console.error('Error fetching portfolio items:', error);
+        setError('Error fetching portfolio items');
+      }
+    };
+
+    fetchPortfolioItems();
+  }, []);
+
+  const handleAddClick = () => {
+    setIsAdding(true);
+  };
 
 
     const submitAppointment = async (e) => {
