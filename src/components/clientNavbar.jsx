@@ -1,19 +1,21 @@
 import { Disclosure, DisclosureButton, DisclosurePanel, MenuItem, MenuItems, MenuButton, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
-// import { signOut } from 'firebase/auth';
-// import { auth } from '../firebaseConfig';
+
 import { useNavigate } from 'react-router-dom';
 import { Fragment, useState } from 'react';
 import Popup from './popup';
 import Notification from './notificationbox';
 import useNavigation from './navigation';
+import avatar from '../assets/images/male_avatar.svg'
+import { useDispatch } from 'react-redux';
+import { logout } from '../redux/slices/userSlice';
 
 const userNavigation = [
   { name: 'Appointments', to: '/appointments' },
   { name: 'Transaction History', to: '/transactions' },
   { name: 'Your Profile', to: '/clientprofile' },
-  { name: 'Sign out', to: "#" },
+  { name: 'Sign out', to: "/usersignin" },
 ];
 
 function classNames(...classes) {
@@ -22,6 +24,7 @@ function classNames(...classes) {
 
 export default function ClientNavBar({userData, toggleHome, toggleConnections}) {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [showNotifications, setShowNotifications] = useState(false);
   const { navigation } = useNavigation();
 
@@ -32,8 +35,8 @@ export default function ClientNavBar({userData, toggleHome, toggleConnections}) 
 
   const handleSignOut = async () => {
     try {
-      await signOut(auth);
-      navigate('/artisansignin');
+      dispatch(logout)
+      navigate('/usersignin');
     } catch (error) {
       console.error('Error signing out:', error);
     }
@@ -86,7 +89,7 @@ export default function ClientNavBar({userData, toggleHome, toggleConnections}) 
                     <div>
                       <MenuButton className="flex text-sm bg-gray-800 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
                         <span className="sr-only">Open user menu</span>
-                        <img className="w-8 h-8 rounded-full" src={userData?.profilePicture} alt="" />
+                        <img className="w-8 h-8 rounded-full" src={avatar} alt="" />
                       </MenuButton>
                     </div>
                     <Transition
@@ -155,7 +158,7 @@ export default function ClientNavBar({userData, toggleHome, toggleConnections}) 
             <div className="pt-4 pb-3 bg-gray-200 border-t border-gray-700">
               <div className="flex items-center px-5">
                 <div className="flex-shrink-0">
-                  <img className="w-10 h-10 rounded-full" src={userData?.profilePicture} alt="" />
+                  <img className="w-10 h-10 rounded-full" src={avatar} alt="" />
                 </div>
                 <div className="ml-3">
                   <div className="text-base font-medium text-gray-900">{`${userData?.fname} ${userData?.lname}`}</div>

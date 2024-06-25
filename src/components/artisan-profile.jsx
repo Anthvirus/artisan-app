@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from 'react';
 import Button from "./Button";
 import { FaWhatsapp } from 'react-icons/fa';
+import { editUser } from '../redux/slices/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
 import { MdEmail, MdPhone } from 'react-icons/md';
 import ArtisanPortfolioItem from "./artisanportfolioitem";
 import client from "./client";
@@ -9,19 +11,20 @@ import avatar from '../assets/images/male_avatar.svg'
 
 
 const ArtisanProfileCard = ({artisan}) => {
+  const dispatch = useDispatch();
   console.log('arisan', artisan)
-
-  const [userData, setUserData] = useState(null);
   const [showProfileForm, setShowProfileForm] = useState(false);
-  const [formData, setFormData] = useState({ 
-      name: "",
-      email: "",
-      phoneNumber:"",
-      whatsappContact: "",
-      officeAddress: "",
-      location: "",  
-    }
-  );
+  const [formValues, setFormValues] = useState({
+    email: artisan.email || '',
+    fname: artisan.fname || '',
+    lname: artisan.lname || '',
+    user_type: artisan.user_type || '',
+    mobile_number: artisan.mobile_number || '',
+    address: artisan.address || '',
+    city: artisan.city || '',
+    state: artisan.state || '',
+    profilePicture: artisan.profilePicture || '',
+  });
 
   const [activeTab, setActiveTab] = useState('profile'); 
   const [isAdding, setIsAdding] = useState(false);
@@ -40,10 +43,10 @@ const ArtisanProfileCard = ({artisan}) => {
 
   const handlePortfolioSave = (e) => {
     e.preventDefault();
-    const formData = new FormData(e.target);
+    const formValues = new FormData(e.target);
     const newPortfolioItem = {
-      image: formData.get('image'),
-      description: formData.get('description'),
+      image: formValues.get('image'),
+      description: formValues.get('description'),
       date: new Date().toISOString().split('T')[0], // Current date
       client: `${client.firstname} ${client.lastname}`
     };
@@ -51,56 +54,45 @@ const ArtisanProfileCard = ({artisan}) => {
     setIsAdding(false);
   };
   
-  const handleChange = (e) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormValues({ ...formValues, [name]: value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (artisan._id) {
-      const url = `${baseUrl}/users/${userId}`;
-      const formDataToSend = new FormData();
-    
-      // Append form data
-      formDataToSend.append('name', formData.name);
-      formDataToSend.append('email', formData.email);
-      formDataToSend.append('mobile_number', formData.phoneNumber);
-      formDataToSend.append('city', formData.location);
-      formDataToSend.append('address', formData.officeAddress);
-     
-      // Append profile picture if it exists
-      if (formData.profilePicture) {
-        formDataToSend.append('picture', formData.profilePicture);
-      }
-    
-      try {
-        const response = await fetch(url, {
-          method: 'PUT',
-          body: formDataToSend,
-          headers: {
-            // Add headers if needed, for example, authorization headers
-            // 'Authorization': 'Bearer your-token'
-          }
-        });
-    
-        if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
-        }
-    
-        const result = await response.json();
-        console.log('Profile updated successfully:', result);
-      } catch (error) {
-        console.error('Error updating profile:', error);
-      }
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result);
+        setFormValues({ ...formValues, profilePicture: file });
+      };
+      reader.readAsDataURL(file);
     }
-    };
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+   
+
+    
+    try {
+      
+      const userId = localStorage.getItem('userId')
+      
+      await dispatch(editUser({ userId: userId, userData: {...formValues} })).unwrap();
+      
+      window.location.reload();
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    } 
+  };
   
 
  
 
   const handleCancel = () => {
-    setFormData(artisan);
+    setFormValues(artisan);
     setShowProfileForm(false);
   };
 
@@ -113,85 +105,93 @@ const ArtisanProfileCard = ({artisan}) => {
       case 'profile':
         if (showProfileForm){
           return (
-            <form onSubmit={handleSubmit} className="w-full p-4 mx-auto overflow-y-auto bg-white rounded-lg shadow-lg">
-        <div className="mb-4">
-        <label className="block text-gray-700">Name</label>
-        <input
-          type="text"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-        </div>
-        <div className="mb-4">
-        <label className="block text-gray-700">Profile Picture</label>
-        <input
-        type="file"
-        name="profilePicture"
-        onChange={handleChange}
-        className="w-full p-2 border rounded"
-        />
-        </div>
-        <div className="mb-4">
-        <label className="block text-gray-700">Email</label>
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-        </div>
-        <div className="mb-4">
-        <label className="block text-gray-700">Phone Number</label>
-        <input
-          type="text"
-          name="phoneNumber"
-          value={formData.phoneNumber}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-        </div>
-        <div className="mb-4">
-        <label className="block text-gray-700">Location</label>
-        <input
-          type="text"
-          name="location"
-          value={formData.location}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-        </div>
-        <div className="mb-4">
-        <label className="block text-gray-700">Office Address</label>
-        <input
-          type="text"
-          name="officeAddress"
-          value={formData.officeAddress}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-        </div>
-        <div className="mb-4">
-        <label className="block text-gray-700">WhatsApp Contact</label>
-        <input
-          type="text"
-          name="whatsappContact"
-          value={formData.whatsappContact}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-        </div>
-        <div className="flex justify-between">
-        <button type="button" onClick={handleCancel} className="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700">
-          Cancel
-        </button>
-        <button type="submit" className="px-4 py-2 text-white bg-green-700 rounded hover:bg-green-800">
-          Save
-        </button>
-      </div>
-            </form>         
+            <form onSubmit={handleFormSubmit} className="flex flex-col gap-y-3">
+              <div>
+                <label className="block text-gray-700">First Name</label>
+                <input
+                  type="text"
+                  name="fname"
+                  value={formValues.fname}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700">Last Name</label>
+                <input
+                  type="text"
+                  name="lname"
+                  value={formValues.lname}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formValues.email}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700">Mobile Number</label>
+                <input
+                  type="tel"
+                  name="mobile_number"
+                  value={formValues.mobile_number}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700">Address</label>
+                <input
+                  type="text"
+                  name="address"
+                  value={formValues.address}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700">City</label>
+                <input
+                  type="text"
+                  name="city"
+                  value={formValues.city}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700">State</label>
+                <input
+                  type="text"
+                  name="state"
+                  value={formValues.state}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700">Profile Picture</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  name="profilePicture"
+                  onChange={handleFileChange}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                />
+              </div>
+              <Button
+                type="submit"
+                text="Save Changes"
+                
+              />
+            </form>        
           )
         } else {
           return (

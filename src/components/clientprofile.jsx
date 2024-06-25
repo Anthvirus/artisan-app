@@ -14,7 +14,6 @@ export default function ClientProfile({user}){
     email: user.email || '',
     fname: user.fname || '',
     lname: user.lname || '',
-    password: '',
     user_type: user.user_type || '',
     mobile_number: user.mobile_number || '',
     address: user.address || '',

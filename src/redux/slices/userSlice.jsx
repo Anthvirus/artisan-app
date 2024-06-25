@@ -4,6 +4,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { jwtDecode } from 'jwt-decode';
 import { baseUrl } from '../../../constants/server';
 
+
 // Async thunk for login
 export const loginUser = createAsyncThunk(
   'user/loginUser',
