@@ -15,15 +15,15 @@ const ArtisanProfileCard = ({artisan}) => {
   console.log('arisan', artisan)
   const [showProfileForm, setShowProfileForm] = useState(false);
   const [formValues, setFormValues] = useState({
-    email: artisan.email || '',
-    fname: artisan.fname || '',
-    lname: artisan.lname || '',
-    user_type: artisan.user_type || '',
-    mobile_number: artisan.mobile_number || '',
-    address: artisan.address || '',
-    city: artisan.city || '',
-    state: artisan.state || '',
-    profilePicture: artisan.profilePicture || '',
+    email: artisan.email,
+    fname: artisan.fname,
+    lname: artisan.lname,
+    user_type: artisan.user_type,
+    mobile_number: artisan.mobile_number,
+    address: artisan.address,
+    city: artisan.city,
+    state: artisan.state,
+    profilePicture: artisan.profilePicture,
   });
 
   const [activeTab, setActiveTab] = useState('profile'); 
