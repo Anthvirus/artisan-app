@@ -29,7 +29,7 @@ export default function ArtisanMyProfile() {
   }, [userId]);
   return (
     <div className="min-h-screen bg-gray-200">
-        <Header heading={(!artisan)? `${artisan.fname + 'Profile'}` : `Your Profile`} link="Back to Home" href={(!artisan)?`/userhome`:`/artisandashboard`}/>
+        <Header heading={(!artisan)? `${artisan.fname + 'Profile'}` : `Your Profile`} link="Back to Home" href={`/artisandashboard`}/>
         <div className='p-4 md:mx-auto mt-2 mx-4 bg-white md:w-3/4 lg:w-1/2 rounded-xl md:h-[40rem] min-h-auto'>
           <ArtisanProfileCard artisan={artisan}/>
         </div>

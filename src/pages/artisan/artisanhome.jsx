@@ -10,6 +10,7 @@ import Header from '../../components/connectionheader';
 import useNavigation from '../../components/navigation';
 import { baseUrl } from '../../../constants/server';
 
+
 export default function ArtisanHome() {
 
   const [userData, setUserData] = useState(null);

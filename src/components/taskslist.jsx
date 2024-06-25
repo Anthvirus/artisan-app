@@ -15,8 +15,11 @@ export default function TasksList() {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
+        //start loading
         const response = await axios.get(`${baseUrl}/appointments/artisan/${userId}`);
+        //end loading
         if (response.status === 200) {
+          
           setTasks(response.data);
           console.log('Appointments fetched:', response.data);
         } else {
@@ -30,6 +33,7 @@ export default function TasksList() {
 
     fetchAppointments();
   }, [userId]);
+
   const deleteAppointment = async (appointmentId) => {
     try {
       const response = await axios.delete(`${baseUrl}/appointments/${appointmentId}`);
@@ -76,8 +80,8 @@ export default function TasksList() {
                   endDate={task.end_date}
                   taskDescription={task.description}
                   taskCompleted={task.iscomplete}
-                  delete={deleteAppointment(task._id)}
-                  complete={completeAppointment(task._id)}
+                  delete={() => deleteAppointment(task._id)}
+                  complete={()=>completeAppointment(task._id)}
                 />
               ))
             )}

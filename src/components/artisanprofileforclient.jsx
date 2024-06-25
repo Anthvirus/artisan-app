@@ -68,27 +68,27 @@ const ArtisanProfileCardForClient = ({ artisan }) => {
     }
   };
 
+  const checkConnection = async () => {
+    try {
+      const clientId = localStorage.getItem('userId'); // Current logged in user
+      const response = await axios.get(`${baseUrl}/connections/${clientId}`);
+      const connections = response.data;
 
+      const existingConnection = connections.find(
+        (connection) => connection.artisan_id._id === artisan._id
+      );
+
+      if (existingConnection) {
+        setIsAlreadyConnected(true);
+        setConnectionId(existingConnection._id); // Store the connection ID
+      }
+    } catch (error) {
+      console.error('Error fetching connections:', error);
+    }
+  };
 
   useEffect(() => {
-    const checkConnection = async () => {
-      try {
-        const clientId = localStorage.getItem('userId'); // Current logged in user
-        const response = await axios.get(`${baseUrl}/connections/${clientId}`);
-        const connections = response.data;
-
-        const existingConnection = connections.find(
-          (connection) => connection.artisan_id._id === artisan._id
-        );
-
-        if (existingConnection) {
-          setIsAlreadyConnected(true);
-          setConnectionId(existingConnection._id); // Store the connection ID
-        }
-      } catch (error) {
-        console.error('Error fetching connections:', error);
-      }
-    };
+    
 
     checkConnection();
   }, [artisan._id]);
@@ -103,7 +103,9 @@ const ArtisanProfileCardForClient = ({ artisan }) => {
       });
       if (response.status === 201) {
         console.log('Connection added:', response.data);
+        checkConnection();
         // React toast here
+
       } else {
         console.error('Error:', response.data.message);
       }
@@ -119,6 +121,7 @@ const ArtisanProfileCardForClient = ({ artisan }) => {
         console.log('Connection removed:', response.data);
         setIsAlreadyConnected(false); // Update the state to reflect the removal
         setConnectionId(null); // Clear the stored connection ID
+        checkConnection();
         // React toast here
       } else {
         console.error('Error:', response.data.message);

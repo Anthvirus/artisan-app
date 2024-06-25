@@ -11,16 +11,15 @@ export default function ClientProfile({user}){
   
   const [isEditing, setIsEditing] = useState(false);
   const [formValues, setFormValues] = useState({
-    email: user.email || '',
-    fname: user.fname || '',
-    lname: user.lname || '',
-    password: '',
-    user_type: user.user_type || '',
-    mobile_number: user.mobile_number || '',
-    address: user.address || '',
-    city: user.city || '',
-    state: user.state || '',
-    profilePicture: user.profilePicture || '',
+    email: user.email,
+    fname: user.fname,
+    lname: user.lname,
+    user_type: user.user_type,
+    mobile_number: user.mobile_number,
+    address: user.address,
+    city: user.city,
+    state: user.state,
+    profilePicture: user.profilePicture,
   });
   // const [preview, setPreview] = useState(user.profilePicture);
   const [isLoading, setIsLoading] = useState(false);
